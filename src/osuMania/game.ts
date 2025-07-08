@@ -1,5 +1,6 @@
 import {
   BeatmapData,
+  Break,
   Difficulty,
   HitObject,
   HitWindows,
@@ -12,12 +13,7 @@ import {
   Settings,
   useSettingsStore,
 } from "@/stores/settingsStore";
-import {
-  Column,
-  GameState,
-  Judgement as JudgementValue,
-  PlayResults,
-} from "@/types";
+import { Column, GameState, PlayResults } from "@/types";
 import { gsap } from "gsap";
 import { PixiPlugin } from "gsap/PixiPlugin";
 import { Howl } from "howler";
@@ -86,8 +82,6 @@ export class Game {
   public stagePositionOffset: number;
   public scaledColumnWidth: number;
 
-  public judgementToShow: JudgementValue | null = null;
-
   // Systems
   public healthSystem?: HealthSystem;
   public scoreSystem: ScoreSystem;
@@ -145,6 +139,8 @@ export class Game {
   public startTime: number;
   public endTime: number;
 
+  public breaks: Break[];
+
   private pauseCountdown: number;
 
   public timingPoints: TimingPoint[];
@@ -168,6 +164,7 @@ export class Game {
     this.hitObjects = beatmapData.hitObjects;
     this.startTime = beatmapData.startTime;
     this.endTime = beatmapData.endTime;
+    this.breaks = beatmapData.breaks;
     this.hitWindows = beatmapData.hitWindows;
     this.difficulty = beatmapData.difficulty;
 
@@ -190,6 +187,10 @@ export class Game {
       laneArrowDirections[this.difficulty.keyCount - 1];
 
     this.setResults = (failed?: boolean) => {
+      if (this.replayRecorder) {
+        this.replayRecorder.replayData.timestamp = Date.now();
+      }
+
       setResults({
         320: this.scoreSystem[320],
         300: this.scoreSystem[300],
@@ -202,8 +203,8 @@ export class Game {
         maxCombo: this.scoreSystem.maxCombo,
         failed,
         viewingReplay: !!this.replayPlayer,
-        replayData:
-          this.replayRecorder?.replayData ?? this.replayPlayer?.replayData,
+        replayData: (this.replayRecorder?.replayData ??
+          this.replayPlayer?.replayData)!,
         hitErrors: this.scoreSystem.hitErrors,
       });
     };
@@ -563,11 +564,7 @@ export class Game {
           this.updateHitObjects();
         }
 
-        if (this.judgement && this.judgementToShow !== null) {
-          this.judgement.showJudgement(this.judgementToShow);
-        }
-
-        this.judgementToShow = null;
+        this.judgement?.showJudgement();
 
         break;
 
