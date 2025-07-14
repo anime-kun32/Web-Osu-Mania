@@ -3,8 +3,8 @@ name = "webosumania"
 compatibility_date = "2025-05-18"
 compatibility_flags = ["nodejs_compat"]
 kv_namespaces = [
-    { binding = "TOKENS", id = "4c393a66c157468282b7e336b1627cd6" },
-    { binding = "BEATMAP_SETS", id = "e24512f619c648009717ac1c53a9f685" },
+    { binding = "TOKENS", id = "d0c50871fb9a40359ca080d6754d99f1" },
+    { binding = "BEATMAP_SETS", id = "a350f70271374c7cb85e6597e64dcb6c" },
 ]
 [assets]
 directory = ".open-next/assets"
